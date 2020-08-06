@@ -61,10 +61,10 @@ class ImageUploadSerializer(serializers.ModelSerializer):
         fields = ('image', 'labels', 'uuid', )
 
     image = Base64ImageField(write_only=True)
-    labels = LabelInternalSerializer(many=True, write_only=True)
+    labels = LabelInternalSerializer(many=True, write_only=True, required=False)
 
     def create(self, validated_data):
-        labels = validated_data.pop('labels')
+        labels = validated_data.pop('labels', [])
         image = Image.objects.create(**validated_data)
 
         for label in labels:
