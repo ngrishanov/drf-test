@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
+from django.db import transaction
 
 from api.models import Image, Label
 
@@ -63,6 +64,7 @@ class ImageUploadSerializer(serializers.ModelSerializer):
     image = Base64ImageField(write_only=True)
     labels = LabelInternalSerializer(many=True, write_only=True, required=False)
 
+    @transaction.atomic()
     def create(self, validated_data):
         labels = validated_data.pop('labels', [])
         image = Image.objects.create(**validated_data)
@@ -80,6 +82,7 @@ class ImageInternalSerializer(serializers.ModelSerializer):
 
     labels = LabelInternalSerializer(many=True)
 
+    @transaction.atomic()
     def update(self, instance, validated_data):
         labels = validated_data.pop('labels')
 
